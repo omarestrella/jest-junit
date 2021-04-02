@@ -47,6 +47,7 @@
                 <xs:element ref="failure" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="system-out" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="system-err" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="assertions" type="xs:string" use="optional"/>

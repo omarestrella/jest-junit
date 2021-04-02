@@ -132,25 +132,34 @@ module.exports = function (report, appDirectory, options) {
     jsonResults.testsuites[0]._attr.tests += suiteNumTests;
 
     if (!ignoreSuitePropertiesCheck) {
-      let junitSuiteProperties = require(junitSuitePropertiesFilePath)(suite);
+      let junitProperties = require(junitSuitePropertiesFilePath)(suite);
 
       // Add any test suite properties
       let testSuitePropertyMain = {
         'properties': []
       };
 
-      Object.keys(junitSuiteProperties).forEach((p) => {
+      let suiteProperties = {};
+      if (junitProperties.suite) {
+        suiteProperties = junitProperties.suite;
+      }
+
+      Object.keys(suiteProperties).forEach((p) => {
         let testSuiteProperty = {
           'property': {
             _attr: {
               name: p,
-              value: replaceVars(junitSuiteProperties[p], suiteNameVariables)
+              value: replaceVars(suiteProperties[p], suiteNameVariables)
             }
           }
         };
 
         testSuitePropertyMain.properties.push(testSuiteProperty);
       });
+
+      // if (testSuitePropertyMain.properties.length === 0) {
+      //   delete testSuitePropertyMain.properties;
+      // }
 
       testSuite.testsuite.push(testSuitePropertyMain);
     }
@@ -178,6 +187,33 @@ module.exports = function (report, appDirectory, options) {
           }
         }]
       };
+
+      if (!ignoreSuitePropertiesCheck) {
+        let junitProperties = require(junitSuitePropertiesFilePath)(suite);
+        testCase.properties = [];
+        
+        let testCaseProperties = {};
+        if (junitProperties.testCases && junitProperties.testCases[tc.title]) {
+          testCaseProperties = junitProperties.testCases[tc.title]
+        }
+
+        Object.keys(testCaseProperties).forEach((p) => {
+          let testCaseProperty = {
+            'property': {
+              _attr: {
+                name: p,
+                value: testCaseProperties[p]
+              }
+            }
+          };
+  
+          testCase.properties.push(testCaseProperty);
+        });
+
+        if (testCase.properties.length === 0) {
+          delete testCase.properties;
+        }
+      }
 
       if (suiteOptions.addFileAttribute === 'true') {
         testCase.testcase[0]._attr.file = filepath;

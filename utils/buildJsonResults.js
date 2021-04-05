@@ -190,7 +190,7 @@ module.exports = function (report, appDirectory, options) {
 
       if (!ignoreSuitePropertiesCheck) {
         let junitProperties = require(junitSuitePropertiesFilePath)(suite);
-        testCase.properties = [];
+        let properties = [];
         
         let testCaseProperties = {};
         if (junitProperties.testCases && junitProperties.testCases[tc.title]) {
@@ -207,11 +207,13 @@ module.exports = function (report, appDirectory, options) {
             }
           };
   
-          testCase.properties.push(testCaseProperty);
+          properties.push(testCaseProperty);
         });
 
-        if (testCase.properties.length === 0) {
-          delete testCase.properties;
+        if (properties.length > 0) {
+          testCase.testcase.push({
+            properties
+          })
         }
       }
 

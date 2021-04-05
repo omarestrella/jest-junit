@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-const xml = require('xml');
-const mkdirp = require('mkdirp');
-const fs = require('fs');
-const path = require('path');
+const xml = require("xml");
+const mkdirp = require("mkdirp");
+const fs = require("fs");
+const path = require("path");
 
-const buildJsonResults = require('./utils/buildJsonResults');
-const getOptions = require('./utils/getOptions');
+const buildJsonResults = require("./utils/buildJsonResults");
+const getOptions = require("./utils/getOptions");
 
 // Store console results from onTestResult to later
 // append to result
@@ -21,10 +21,17 @@ const processor = (report, reporterOptions = {}, jestRootDir = null) => {
     t.console = consoleBuffer[t.testFilePath];
   });
 
-  const jsonResults = buildJsonResults(report, fs.realpathSync(process.cwd()), options);
+  const jsonResults = buildJsonResults(
+    report,
+    fs.realpathSync(process.cwd()),
+    options
+  );
 
   // Set output to use new outputDirectory and fallback on original output
-  const outputName = (options.uniqueOutputName === 'true') ? getOptions.getUniqueOutputName() : options.outputName
+  const outputName =
+    options.uniqueOutputName === "true"
+      ? getOptions.getUniqueOutputName()
+      : options.outputName;
   const output = path.join(options.outputDirectory, outputName);
 
   const finalOutput = getOptions.replaceRootDirInOutput(jestRootDir, output);
@@ -33,7 +40,10 @@ const processor = (report, reporterOptions = {}, jestRootDir = null) => {
   mkdirp.sync(path.dirname(finalOutput));
 
   // Write data to file
-  fs.writeFileSync(finalOutput, xml(jsonResults, { indent: '  ', declaration: true }));
+  fs.writeFileSync(
+    finalOutput,
+    xml(jsonResults, { indent: "  ", declaration: true })
+  );
 
   // Jest 18 compatibility
   return report;
@@ -55,15 +65,19 @@ const processor = (report, reporterOptions = {}, jestRootDir = null) => {
 // for the constructor to be invoked statically and via "new"
 // so we can support both testResultsProcessor and reporters
 // TODO: refactor to es6 class after testResultsProcessor support is removed
-function JestJUnit (globalConfig, options) {
+function JestJUnit(globalConfig, options) {
   // See if constructor was invoked statically
   // which indicates jest-junit was invoked as a testResultsProcessor
   // and show deprecation warning
 
-  if (globalConfig.hasOwnProperty('testResults')) {
-    const newConfig = JSON.stringify({
-      reporters: ['jest-junit']
-    }, null, 2);
+  if (globalConfig.hasOwnProperty("testResults")) {
+    const newConfig = JSON.stringify(
+      {
+        reporters: ["jest-junit"],
+      },
+      null,
+      2
+    );
 
     return processor(globalConfig);
   }
